@@ -1,0 +1,29 @@
+<form>
+  <div>
+    <label>Select file to upload</label>
+    <input type="file" id="file-input" />
+  </div>
+</form>
+<script>
+  document
+    .getElementById("file-input")
+    .addEventListener("change", async ({ target: { files: [file] } }) => {
+      const response = await fetch(`/add/${file.name}`, {
+        method: "POST",
+        body: file
+      });
+      if (response.contentType !== "application/json") {
+        console.error(await response.text());
+        return;
+      }
+      const json = await response.json();
+      if (json.status === "error") {
+        console.error(json.message);
+        return;
+      }
+      if (json.status !== "success") {
+        console.error("Unknown return status", json.status);
+      }
+      console.info(json.filename);
+    });
+</script>
